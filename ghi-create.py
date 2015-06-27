@@ -72,8 +72,6 @@ if not (user and password):
 github = login(user, password)
 
 repo = github.repository(repo_user, repo_name)
-#for milestone in repo.milestones():
-#    print(milestone.title, milestone.number)
 
 for card in cards:
     repo.create_issue(
