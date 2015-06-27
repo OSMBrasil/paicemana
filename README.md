@@ -1,4 +1,4 @@
-O `paicemana` é o programa de linha de comando que viabiliza semanalmente o fluxo de trabalho para a realização colaborativa e rastreável das traduções do projeto [OSMBrasil/semanario].
+O `paicemana` é o programa de linha de comando que viabiliza semanalmente o fluxo de trabalho para a realização colaborativa e rastreável das traduções no projeto [OSMBrasil/semanario].
 
 - [x] Baixa semanários de [weeklyosm.eu] convertendo em markdown
 - [ ] Distribui as seções do documento entre os tradutores
@@ -28,6 +28,6 @@ $ sudo pip uninstall paicemana
 
 [GPLv3]
 
-[OSMBrasil/semanario]: /OSMBrasil/semanario
+[OSMBrasil/semanario]: http://www.github.com/OSMBrasil/semanario
 [weeklyosm.eu]: http://weeklyosm.eu
 [GPLv3]: LICENSE
