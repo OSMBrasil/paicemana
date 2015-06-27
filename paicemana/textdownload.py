@@ -24,9 +24,8 @@ class MarkdownDownload(object):
         markdown = html2text.html2text(root_html.decode('utf-8'))
 
         s = markdown
-        #s = re.sub(r'\n *', '\n', s)
-        #s = re.sub(r'^ *', '', s)
-        #s = re.sub(r'\\n', '', s)
+        s = re.sub(r'\n *', '\n', s)
+        s = re.sub(r'^ *', '', s)
         s = re.sub(r'\n', '\n\n', s)
         s = re.sub(r'\n\n\n\n?', '\n\n', s)
         s = re.sub(r'…', '...', s)
