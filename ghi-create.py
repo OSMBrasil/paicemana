@@ -14,32 +14,30 @@
 #
 # Na maturidade este programa estará integrado como comando do paicemana.
 #
-# @ alexandre-mbm ‒ Alexandre Magno ‒ alexandre.mbm@gmail.com 
+#     @alexandre-mbm  ‒  Alexandre Magno  ‒  alexandre.mbm@gmail.com
+#
+############################   Variables   #####################################
 
 translators = ['alexandre-mbm', 'jgpacker', 'vgeorge']
 
 milestone = 1               # 256 (1), 257 (2)
-label = 'revisão'           # tradução, revisão, movimento, conserto
+
+label_t = 'tradução'        # tradução, revisão, movimento, conserto
+label_r = 'revisão'         # tradução, revisão, movimento, conserto
 
 filename = 'archive-4205.md'
 
 repo_user = 'OSMBrasil'
 repo_name = 'semanario'
 
-from github3 import login, GitHub
+#############################   Preload   ######################################
+
 from paicemana.mdanalyzer import MarkdownAnalyzer
-
-analyzer = MarkdownAnalyzer(filename)
-organizer = analyzer.getOrganizer()
-organizer.distribute_for(translators)
-
-for section in organizer.sections:
-    print(section.score, section.translator, section.reviser, section.name)
-
-exit(0)
-
 from getpass import getpass, getuser
+from github3 import login, GitHub
+
 import sys
+
 try:
     import readline
 except ImportError:
@@ -51,27 +49,55 @@ try:
 except NameError:
     pass
 
-try:
-    user = input('GitHub username: ')
-except KeyboardInterrupt:
-    user = getuser()
+#############################   Functions   ####################################
 
-password = getpass('GitHub password for {0}: '.format(user))
+def get_github():
 
-# Obviously you could also prompt for an OAuth token
-if not (user and password):
-    print("Cowardly refusing to login without a username and password.")
-    sys.exit(1)
+    try:
+        user = input('GitHub username: ')
+    except KeyboardInterrupt:
+        user = getuser()
 
-github = login(user, password)
+    password = getpass('GitHub password for {0}: '.format(user))
+
+    # Obviously you could also prompt for an OAuth token
+    if not (user and password):
+        print("Cowardly refusing to login without a username and password.")
+        sys.exit(1)
+
+    return login(user, password)
+
+#############################   Program   ######################################
+
+analyzer = MarkdownAnalyzer(filename)
+organizer = analyzer.getOrganizer()
+organizer.distribute_for(translators)
+
+for section in organizer.sections:
+    print(section.score, section.translator, section.reviser, section.name)
+
+#exit(0)
+
+github = get_github()
 
 repo = github.repository(repo_user, repo_name)
 
-for card in cards:
+exit(0)  # TODO main flow and populate function
+
+for section in organizer.sections:
     repo.create_issue(
-        card['section'],
+        section.name,
         body=None,
-        assignee=card['translator'],
+        assignee=section.translator,
         milestone=milestone,
-        labels=[label]
+        labels=[label_t]
+    )
+
+for section in organizer.sections:
+    repo.create_issue(
+        section.name,
+        body=None,
+        assignee=section.reviser,
+        milestone=milestone,
+        labels=[label_r]
     )
