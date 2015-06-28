@@ -29,15 +29,25 @@ class WorkOrganizer(object):
         stack = self.__new_stack__()
         while len(stack) > 0:
             section = stack.pop()
-            section.translator = self.translators.next()   
+            universo = set(self.translators.array)
+            one = self.score_of_a_vacated_people(universo).translator
+            section.translator = one
  
+    def score_of_a_vacated_people(self, universo, work='translations'):
+        factor = math.sqrt(len(universo))
+        scores = SortedList(load=round(factor))
+        for (people, score) in self.__scores__().items():
+            if people in universo:
+                scores.add(TranslatorScore(people, score[work]))
+        return scores.pop(0)
+
     def __assign_revisions__(self):
         stack = self.__new_stack__()
         while len(stack) > 0:
             section = stack.pop()
-            one = self.translators.next()
-            if one == section.translator:
-                one = self.translators.next()  # TODO fix for unique reviser
+            universo = set(self.translators.array)
+            universo.remove(section.translator)
+            one = self.score_of_a_vacated_people(universo, 'revisions').translator
             section.reviser = one
 
     def __scores__(self):
@@ -100,6 +110,43 @@ class TranslatorsSpinner(object):
         self.index += 1
         return self.array[pos]
 
+
+class TranslatorScore(object):
+
+    def __init__(self, translator, score = 0):
+        self.translator = translator
+        self.score = score
+
+    def plus(self, score):
+        self.score += score
+        return self
+
+    def __str__(self):
+        return '%s %s' % (self.translator, self.score)
+
+    def __int__(self):
+        return self.score
+
+    def __lt__(self, other):
+        return self.score < other.score
+
+    def __le__(self, other):
+        return self.score <= other.score
+
+    def __eq__(self, other):
+        return self.score == other.score
+
+    def __ne__(self, other):
+        return self.score != other.score
+
+    def __gt__(self, other):
+        return self.score > other.score
+
+    def __ge__(self, other):
+        return self.score >= other.score
+
+    def __hash__(self):
+        return hash(self.translator)
 
 class MarkdownSection(object):
 
@@ -175,4 +222,5 @@ if __name__ == "__main__":
     print(organizer.scores())
     #spinner = TranslatorsSpinner(translators)
     #test_spinner(spinner)
+    print(int(TranslatorScore('alex', 10).plus(3).plus(2)))
 
