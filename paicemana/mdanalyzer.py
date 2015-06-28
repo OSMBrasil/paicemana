@@ -94,7 +94,7 @@ class WorkOrganizer(object):
     def __len__(self):
         return len(self.sections)
 
-class TranslatorsSpinner(object):
+class TranslatorsSpinner(object):  # TODO deactivate it?
 
     def __init__(self, array):
         self.index = 0

@@ -16,33 +16,27 @@
 #
 # @ alexandre-mbm ‒ Alexandre Magno ‒ alexandre.mbm@gmail.com 
 
+translators = ['alexandre-mbm', 'jgpacker', 'vgeorge']
+
 milestone = 1               # 256 (1), 257 (2)
 label = 'revisão'           # tradução, revisão, movimento, conserto
-filename = 'revisoes.csv'   # traducoes.csv, revisoes.csv
+
+filename = 'archive-4205.md'
 
 repo_user = 'OSMBrasil'
 repo_name = 'semanario'
 
 from github3 import login, GitHub
+from paicemana.mdanalyzer import MarkdownAnalyzer
 
-cards = [
-    { 'section': 'Events', 'translator': 'jgpacker'},
-    { 'section': 'Humanitarian OSM', 'translator': 'jgpacker'},
-    { 'section': 'Maps', 'translator': 'jgpacker'},
-    { 'section': 'Software', 'translator': 'jgpacker'},
-    { 'section': 'Did you know...', 'translator': 'jgpacker'},
-    { 'section': 'Other "geo" things', 'translator': 'vgeorge'}
-]
+analyzer = MarkdownAnalyzer(filename)
+organizer = analyzer.getOrganizer()
+organizer.distribute_for(translators)
 
-cards = []
+for section in organizer.sections:
+    print(section.score, section.translator, section.reviser, section.name)
 
-import csv
-with open(filename, newline='') as csvfile:
-    spamreader = csv.DictReader(csvfile, delimiter='|')
-    for row in spamreader:
-        cards.append(row)
-
-#exit(0)
+exit(0)
 
 from getpass import getpass, getuser
 import sys
