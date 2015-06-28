@@ -40,8 +40,8 @@ class WorkOrganizer(object):
                 one = self.translators.next()  # TODO fix for unique reviser
             section.reviser = one
 
-    def scores(self):
-        s = ''
+    def __scores__(self):
+        scores = {}
         for people in self.translators.array:
             score_translations = 0
             score_revisions = 0
@@ -50,7 +50,20 @@ class WorkOrganizer(object):
                     score_translations += section.score
                 if section.reviser == people:
                     score_revisions += section.score
-            s += '%s %s %s\n' % (score_translations, score_revisions, people)
+            scores[people] = {
+                                'translations': score_translations,
+                                'revisions': score_revisions
+                             }
+        return scores
+
+    def scores(self):
+        s = ''
+        for (people, score) in self.__scores__().items():
+            s += '%s %s %s\n' % (
+                                    score['translations'],
+                                    score['revisions'],
+                                    people
+                                )
         return s[:-1]
     
     def __repr__(self):
