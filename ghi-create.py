@@ -67,37 +67,49 @@ def get_github():
 
     return login(user, password)
 
+def put_issues_of_translations(organizer):  # TODO use or change
+    for section in organizer.sections:
+        repo.create_issue(
+            section.name,
+            body=None,
+            assignee=section.translator,
+            milestone=milestone,
+            labels=[label_t]
+        )
+
+def put_issues_of_revisions(organizer):  # TODO use or change
+    for section in organizer.sections:
+        repo.create_issue(
+            section.name,
+            body=None,
+            assignee=section.reviser,
+            milestone=milestone,
+            labels=[label_r]
+        )
+
+def test_print_sections(organizer):
+    for section in organizer.sections:
+        print(section.score, section.translator, section.reviser, section.name)
+
+def test_put_issues_of_translations(organizer):
+    print(milestone, label_t)
+
+def test_put_issues_of_revisions(organizer):
+    print(milestone, label_r)
+
 #############################   Program   ######################################
 
-analyzer = MarkdownAnalyzer(filename)
-organizer = analyzer.getOrganizer()
-organizer.distribute_for(translators)
+if __name__ == "__main__":
 
-for section in organizer.sections:
-    print(section.score, section.translator, section.reviser, section.name)
+    analyzer = MarkdownAnalyzer(filename)
+    organizer = analyzer.getOrganizer()
+    organizer.distribute_for(translators)
 
-#exit(0)
+    github = get_github()
 
-github = get_github()
+    repo = github.repository(repo_user, repo_name)
 
-repo = github.repository(repo_user, repo_name)
+    test_print_sections(organizer)
+    test_put_issues_of_translations(organizer)
+    test_put_issues_of_revisions(organizer)
 
-exit(0)  # TODO main flow and populate function
-
-for section in organizer.sections:
-    repo.create_issue(
-        section.name,
-        body=None,
-        assignee=section.translator,
-        milestone=milestone,
-        labels=[label_t]
-    )
-
-for section in organizer.sections:
-    repo.create_issue(
-        section.name,
-        body=None,
-        assignee=section.reviser,
-        milestone=milestone,
-        labels=[label_r]
-    )
