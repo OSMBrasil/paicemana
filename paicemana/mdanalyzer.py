@@ -1,5 +1,6 @@
 from codecs import open as codecs_open
 from sortedcontainers import SortedList  # TODO in setup.py
+from tabulate import tabulate  # TODO in setup.py
 
 import re
 import math
@@ -77,15 +78,18 @@ class WorkOrganizer(object):
         return s[:-1]
     
     def __repr__(self):
-        s = ''
+        table = []
+        headers = ['Score', 'Translator', 'Section', 'Reviser']
+        table.append(headers)
         for section in self.sections:
-            s += '%s %s %s %s\n' % (
-                                        section.score,
-                                        section.translator,
-                                        section.name,
-                                        section.reviser
-                                    )
-        return s[:-1]
+            line = [
+                        section.score,
+                        section.translator,
+                        section.name,
+                        section.reviser
+                   ]
+            table.append(line)
+        return tabulate(table, headers='firstrow')
 
     def __len__(self):
         return len(self.sections)
@@ -216,11 +220,15 @@ def test_spinner(spinner):
 if __name__ == "__main__":
     analyzer = MarkdownAnalyzer('archive-4205.md')
     organizer = analyzer.getOrganizer()
-    translators = ['alexandre-mbm', 'jgpacker', 'vgeorge']
+    translators = ['alexandre-mbm', 'jgpacker', 'vgeorge']  # TODO as set
     organizer.distribute_for(translators)
-    #print(organizer)
+    print()
+    print(organizer)
+    print()
     print(organizer.scores())
     #spinner = TranslatorsSpinner(translators)
     #test_spinner(spinner)
+    print()
     print(int(TranslatorScore('alex', 10).plus(3).plus(2)))
+    print()
 
