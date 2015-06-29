@@ -1,7 +1,7 @@
 O `paicemana` é o programa de linha de comando que viabiliza semanalmente o fluxo de trabalho para a realização colaborativa e rastreável das traduções no projeto [OSMBrasil/semanario].
 
 - [x] Baixa semanários de [weeklyosm.eu] convertendo em markdown
-- [ ] Distribui as seções do documento entre os tradutores
+- [x] Distribui as seções do documento entre os tradutores
 - [ ] Cria automaticamente toda a infraestrutura do _milestone_ semanal
 
 ## Instalação
