@@ -4,6 +4,7 @@ import datetime
 import click
 
 from paicemana.textdownload import MarkdownDownload
+from paicemana.mdanalyzer import MarkdownAnalyzer
 from urllib.error import HTTPError
 
 
@@ -18,7 +19,12 @@ def cli(archive):
     if not archive:
         raise click.UsageError('try the -h/--help option')
     try:
-        MarkdownDownload(archive)
+        download = MarkdownDownload(archive)
+        analyzer = MarkdownAnalyzer(download.filename)
+        organizer = analyzer.getOrganizer()
+        translators = ['alexandre-mbm', 'jgpacker', 'vgeorge']
+        organizer.distribute_for(translators)
+        print('\n%s\n\n%s\n' % (organizer, organizer.scores()))
     except HTTPError as e:
         click.echo(e)
 
