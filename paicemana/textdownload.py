@@ -37,6 +37,8 @@ class MarkdownDownload(object):
         s = s.split('### Share this:')[0]
         s = s.split('### Compartilhe isso:')[0]
         s = re.sub(r'## *', '## ', s)
+        s = re.sub(r'😉', ';)', s)
+
         markdown = s
         #print(markdown)
 
