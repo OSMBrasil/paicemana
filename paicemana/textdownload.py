@@ -36,6 +36,7 @@ class MarkdownDownload(object):
         s = re.sub(r' \[\]\(.*\/OSMBrasil\/semanario.*\n\n.*\)', '', s)
         s = s.split('### Share this:')[0]
         s = s.split('### Compartilhe isso:')[0]
+        s = re.sub(r'## *', '## ', s)
         markdown = s
         #print(markdown)
 
