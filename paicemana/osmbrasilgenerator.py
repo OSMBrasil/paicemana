@@ -1,6 +1,8 @@
-import json, urllib
-import requests, wget, feedparser  # TODO in setup.py
+import json, datetime
+import requests, feedparser, PyRSS2Gen  # TODO in setup.py
+from lxml import etree  # TODO in setup.py
 from pprint import pprint  # TODO in setup.py
+
 
 class Week(object):
 
@@ -56,37 +58,83 @@ class JSONDownload(object):  # TODO class's comment
         return '[weeklyosm-%s]' % number
 
 
-class RSSDownload(object):  # TODO class's comment DON'T USE IT
-    """Class to ..."""
-  
-    def __init__(self, url='http://pipes.yahoo.com/pipes/pipe.run?_id=6a998c98efa04e57b9a6babadcfc462b&_render=rss', filename='weeklyosm-pt.xml'):
-        self.__filename = filename        
-        urllib.request.urlretrieve (url, self.__filename)
+class PaicemanaFeed(PyRSS2Gen.RSS2):
 
-    def __str__(self):
-        return self.__filename
+    rss_attrs = {
+        "version": "2.0",
+        "xmlns:atom": "http://www.w3.org/2005/Atom"
+    }
 
-
-class RSSDownloadMinimal(RSSDownload):  # TODO class's comment DON'T USE IT
-    
-    def __init__(self, url='http://pipes.yahoo.com/pipes/pipe.run?_id=1062c25a278564badfe33e04382d40a8&_render=rss', filename='weeklyosm-pt.min.xml'):
-        return super(RSSDownloadMinimal, self).__init__(url, filename) 
+    def publish_extensions(self, handler):
+        PyRSS2Gen._element(handler, 'atom:link', None,
+                           {'rel': 'self',
+                            'type': 'application/rss+xml',
+                            'href': 'http://www.openstreetmap.com.br/weeklyosm.xml',
+                            })
 
 
 # https://validator.w3.org/feed/
 
-class RSSDownloadFromScratch(object):  # TODO class's comment # TODO
+class RSSDownload(object):  # TODO class's comment # TODO
     """Class to ..."""
 
     def __init__(self):
 
         url = 'http://www.weeklyosm.eu/pt/feed'
         self.feed = feedparser.parse(url)
+        self.__filter__()
+        self.__transform__()
+        self.__write__()
+        self.__format__()
+
+    def __filter__(self):
+        to_remove = []
+        for entry in self.feed.entries:
+            if not entry.title \
+               or len(entry.title) == 0 \
+               or entry.title.startswith('(English)'):
+                to_remove.append(entry)
+        for e in to_remove:
+            self.feed.entries.remove(e)
+
+    def __transform__(self):
+        for entry in self.feed.entries:
+            entry.title = entry.title.replace('.‒', ' a ')
+            entry.title = entry.title.replace('.–', ' a ')
+            entry.title = entry.title.replace('.-', ' a ')
+            entry.title = entry.title.replace('.', '/')
+
+    def __write__(self):
+        rss = PaicemanaFeed(
+            title = "WeeklyOSM em Português do Brasil",
+            link = "http://www.openstreetmap.com.br/weeklyosm.xml",
+            description = "Um resumo semanal de todas as coisas que acontecem no mundo do OpenStreetMap",
+            lastBuildDate = datetime.datetime.now(),
+            items = self.__items_for_write__()
+        )
+        rss.write_xml(open("weeklyosm.xml", "w"), encoding = "utf-8")
+
+    def __format__(self):
+        parser = etree.XMLParser(remove_blank_text=True)
+        tree = etree.parse("weeklyosm.xml", parser)
+        tree.write("weeklyosm.xml", pretty_print=True)
+
+    def __items_for_write__(self):
+        items = []
+        for entry in self.feed.entries:
+            item =  PyRSS2Gen.RSSItem(
+                title = entry.title,
+                link = entry.link,
+                description = None,
+                guid = entry.id,
+                pubDate = entry.published
+            )
+            items.append(item)
+        return items
 
 
 if __name__ == "__main__":
     #print(JSONDownload())
-    print(JSONDownload().markdown())
-    #pprint(RSSDownloadFromScratch().feed)
-    #print(RSSDownload())
-    #print(RSSDownloadMinimal())
+    #print(JSONDownload().markdown())
+    RSSDownload()
+
