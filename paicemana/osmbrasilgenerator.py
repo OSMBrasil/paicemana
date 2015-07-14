@@ -1,7 +1,6 @@
 import json, datetime
-import requests, feedparser, PyRSS2Gen  # TODO in setup.py
+import feedparser, PyRSS2Gen  # TODO in setup.py
 from lxml import etree  # TODO in setup.py
-from pprint import pprint  # TODO in setup.py
 
 
 class Week(object):
@@ -18,19 +17,18 @@ class Week(object):
         return self.title
 
 
-class JSONDownload(object):  # TODO class's comment
+class DataCaught(object):  # TODO class's comment
     """Class to ..."""
 
     def __init__(self):
 
         self.weeks = []
 
-        url = 'http://pipes.yahoo.com/pipes/pipe.run?_id=1062c25a278564badfe33e04382d40a8&_render=json'
-        response = requests.get(url)
-        data = response.json()
+        url = 'weeklyosm.xml'
+        feed = feedparser.parse(url)
         
-        for item in data['value']['items']:
-            w = Week(item['title'], item['link'])
+        for entry in feed.entries:
+            w = Week(entry.title, entry.link)
             self.weeks.append(w)
 
     def __str__(self):
@@ -155,7 +153,7 @@ class RSSDownload(object):  # TODO class's comment # TODO
 
 
 if __name__ == "__main__":
-    #print(JSONDownload())
-    #print(JSONDownload().markdown())
-    RSSDownload()
+    #RSSDownload()
+    #print(DataCaught())
+    print(DataCaught().markdown())
 
