@@ -69,12 +69,37 @@ class ChangerPosting(object):
         print(self.post)
 
 
+class ExtractorPosting(object):
+
+    def __init__(self, post, lang='Ja'):
+        self.post = post
+        self.lang = lang
+
+    def do(src, lang):
+        return re.findall(
+            r'<!--:%s-->((.(?<!<\!--:-->))*)' % lang,
+            src,
+            flags = re.MULTILINE + re.DOTALL
+        )[0][0][:-7]
+
+    def do_content(self):
+        return ExtractorPosting.do(self.post.content, self.lang)
+
+    def do_title(self):
+        return ExtractorPosting.do(self.post.title, self.lang)
+
+
 if __name__ == "__main__":
     #test()
     post = MockPost()
     #print(post)
+    """
     changer = ChangerPosting(post)
     s = 'My text here'
     changer.do_for(s, s)
     changer.print_test()
+    """
+    extractor = ExtractorPosting(post, 'pt')
+    print(extractor.do_title())
+    print(extractor.do_content())
 
