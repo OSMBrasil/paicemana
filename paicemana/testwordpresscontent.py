@@ -1,4 +1,12 @@
-src = """<!--:en-->23.06.-29.06.2015
+src_title = """<!--:en-->weekly 256 - 09.06.–15.06.2015<!--:-->
+
+<!--:es-->semanario 256 - 09.06.–15.06.2015<!--:--><!--:Ja-->週刊OSM 256 - 09.06.–15.06.2015<!--:--><!--:fr-->hebdo 256 - 09.06.–15.06.2015<!--:--><!--:cz-->týdeník 256 - 
+09.06.–\r
+15.06.2015<!--:--><!--:id-->edisi minggu 256 - 09.06.–15.06.2015<!--:--><!--:tr--> 256 - 09.06.–15.06.2015<!--:--><!--:pt-->semanário 256 - 09.06.–15.06.2015<!--:-->
+<!--:de-->Wochennotiz 256 - 09.06.–15.06.2015<!--:--><!--:ro-->Săptămânal nr. 256 - 09.06.–15.06.2015<!--:-->
+"""
+
+src_content = """<!--:en-->23.06.-29.06.2015
 
 [caption id="attachment_11897" align="alignnone" width="640"]<a href="http://blog.openstreetmap.de/wp-uploads//2015/06/Elbphilharmonie_zensiert-Eine_Welt_ohne_Panoramafreiheit.jpg"><img class="size-full wp-image-11897" title="Spendenaufkommen OSMF-Spendenmarathon 2015" src="http://blog.openstreetmap.de/wp-uploads//2015/07/spendenkampagne-server2015-path.svg" alt="Säulendiagramm des Spendenaufkommens, eine Säule pro Tag" width="640" height="360" /></a> Donations during the fundraising campaign to finance new hardware for OSM. <a href="https://lists.openstreetmap.org/pipermail/osmf-talk/attachments/20150630/feede3ff/attachment-0001.png">Chart: Nakaner - data: Frederik Ramm</a>. <a href="#258-osmf">[1]</a>[/caption]
 <h2 id="in-eigener-sache">About us</h2>
