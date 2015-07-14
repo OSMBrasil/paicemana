@@ -1,20 +1,26 @@
 from wordpress_xmlrpc import Client
 from wordpress_xmlrpc.methods import posts
 
-client = Client(
-                    'http://www.weeklyosm.eu/xmlrpc.php',
-                    'alexandre', 'SENHA'
-                )
+def test():
 
-posts = client.call(posts.GetPosts())
+    client = Client(
+                        'http://www.weeklyosm.eu/xmlrpc.php',
+                        'alexandre', 'SENHA'
+                    )
 
-#for post in posts[:1]:
-    #print(posts[1].id)
-    #print(posts[1].title)
-    #print(posts[1].link)
-print(posts[0].content)
+    posts = client.call(posts.GetPosts())
 
-# http://python-wordpress-xmlrpc.readthedocs.org/en/latest
-#
-# http://codex.wordpress.org/XML-RPC_WordPress_API
-# https://github.com/maxcutler/python-wordpress-xmlrpc/
+    #for post in posts[:1]:
+        #print(posts[1].id)
+        #print(posts[1].title)
+        #print(posts[1].link)
+    print(posts[0].content)
+
+    # http://python-wordpress-xmlrpc.readthedocs.org/en/latest
+    #
+    # http://codex.wordpress.org/XML-RPC_WordPress_API
+    # https://github.com/maxcutler/python-wordpress-xmlrpc/
+
+
+if __name__ == "__main__":
+    test()
