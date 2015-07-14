@@ -58,6 +58,8 @@ class JSONDownload(object):  # TODO class's comment
         return '[weeklyosm-%s]' % number
 
 
+# https://pythonhosted.org/DeeFuzzer/deefuzzer.deefuzzer.tools.PyRSS2Gen-module.html
+
 class PaicemanaFeed(PyRSS2Gen.RSS2):
 
     rss_attrs = {
@@ -65,12 +67,22 @@ class PaicemanaFeed(PyRSS2Gen.RSS2):
         "xmlns:atom": "http://www.w3.org/2005/Atom"
     }
 
+    def __init__(self, selflink=None, *args, **kwargs):
+        self.selflink = selflink
+        super(PaicemanaFeed, self).__init__(*args, **kwargs)
+
     def publish_extensions(self, handler):
-        PyRSS2Gen._element(handler, 'atom:link', None,
+
+        if self.selflink:
+            PyRSS2Gen._element(handler, 'atom:link', None,
                            {'rel': 'self',
                             'type': 'application/rss+xml',
-                            'href': 'http://www.openstreetmap.com.br/weeklyosm.xml',
+                            'href': self.selflink,
                             })
+
+        #def characters(self, key, description):
+        #    self._out.write('%s<![CDATA[\n %s \n]]>%s' % ("<%s>"%key, description, "</%s>"%key))
+        #characters(handler, "description", self.d1)
 
 
 # https://validator.w3.org/feed/
@@ -110,6 +122,15 @@ class RSSDownload(object):  # TODO class's comment # TODO
             link = "http://www.openstreetmap.com.br/weeklyosm.xml",
             description = "Um resumo semanal de todas as coisas que acontecem no mundo do OpenStreetMap",
             lastBuildDate = datetime.datetime.now(),
+            docs = None,
+            image = PyRSS2Gen.Image(
+                url = self.feed.feed.image.href,
+                title = self.feed.feed.image.title,
+                link = self.feed.feed.image.link,
+                width=self.feed.feed.image.width,
+                height=self.feed.feed.image.height
+            ),
+            selflink = "http://www.openstreetmap.com.br/weeklyosm.xml",
             items = self.__items_for_write__()
         )
         rss.write_xml(open("weeklyosm.xml", "w"), encoding = "utf-8")
