@@ -1,11 +1,14 @@
+import os
 import time
 import datetime
+import configparser
 
 import click
 
-from paicemana.textdownload import MarkdownDownload
+from paicemana.wordpressrxmlrpc import MarkdownDownload
 from paicemana.mdanalyzer import MarkdownAnalyzer
 from urllib.error import HTTPError
+from wordpress_xmlrpc.exceptions import InvalidCredentialsError
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -21,7 +24,11 @@ def cli(archive, sync):
     if not archive:
         raise click.UsageError('try the -h/--help option')
     try:
-        download = MarkdownDownload(archive, sync)
+        config = configparser.ConfigParser()
+        config.read([os.path.expanduser('~/.paicemana')], encoding='utf-8')
+        user = str(config['weeklyosm.eu']['User'])
+        password = str(config['weeklyosm.eu']['Password'])  #.replace('%%', '%')
+        download = MarkdownDownload(user, password, archive, sync)
         if not sync:
             analyzer = MarkdownAnalyzer(download.filename)
             organizer = analyzer.getOrganizer()
@@ -29,5 +36,7 @@ def cli(archive, sync):
             organizer.distribute_for(translators)
             print('\n%s\n\n%s\n' % (organizer, organizer.scores()))
     except HTTPError as e:
+        click.echo(e)
+    except InvalidCredentialsError as e:
         click.echo(e)
 
