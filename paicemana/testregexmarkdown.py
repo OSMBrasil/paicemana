@@ -1,7 +1,4 @@
 import re
-import html2text  # TODO in setup.py
-import lxml.html  # TODO in setup.py
-import markdown2  # TODO in setup.py
 
 
 src = """23.06.‒29.06.2015
@@ -22,30 +19,14 @@ talk/attachments/20150630/feede3ff/attachment-0001.png) [1][/caption]
 
 ## Mapeamento"""
 
+
 out = re.findall(
     r'\[caption.*caption\]',
     src,
     flags = re.MULTILINE + re.DOTALL
 )[0]
 
-html = markdown2.markdown(out)
-html = lxml.html.fromstring(html)
-
-out = lxml.html.tostring(html).decode("utf-8")
-
-out = re.sub(r'\%0A', '', out)
 out = re.sub(r'\n', ' ', out)
+out = re.sub(r'(\(http[^\)]*) ', r'\1', out)
 
-html2text.BODY_WIDTH = 0  # don't work in Python 3
-
-a1 = r'\[caption id="attachment_.*" align="alignnone" width="640"\]'
-a2 = r'\[\/caption]'
-
-out = re.sub(a1, '', out)
-out = re.sub(a2, '', out)
-
-#print(out)
-
-markdown = html2text.html2text(out)
-
-print(markdown)
+print(out)
