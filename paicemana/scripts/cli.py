@@ -5,7 +5,7 @@ import configparser
 
 import click
 
-from paicemana.wordpressrxmlrpc import MarkdownDownload
+from paicemana.wordpressxmlrpc import MarkdownDownload
 from paicemana.mdanalyzer import MarkdownAnalyzer
 from urllib.error import HTTPError
 from wordpress_xmlrpc.exceptions import InvalidCredentialsError
