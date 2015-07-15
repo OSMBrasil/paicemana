@@ -2,6 +2,7 @@ from wordpress_xmlrpc import Client
 from wordpress_xmlrpc.methods import posts
 
 import re
+import html2text
 
 
 def test():
@@ -89,7 +90,54 @@ class ExtractorPosting(object):
         return ExtractorPosting.do(self.post.title, self.lang)
 
 
-if __name__ == "__main__":
+# TODO a class MarkdownDownload() here, using the ExtractorPosting()
+
+class MarkdownDownload(object):
+    """Class to download text weeklyosm.eu"""
+
+    def __init__(self, user, password, archive, sync=False):
+        """
+        @params
+        archive - number in permalink like www.weeklyosm.eu/archives/4205
+        sync - True for downloading the brazilian version already published
+        """
+
+        client = Client('http://www.weeklyosm.eu/xmlrpc.php', user, password)
+        self.post = client.call(posts.GetPost(archive))
+
+        lang = 'en' if not sync else 'pt'
+        extractor = ExtractorPosting(self.post, lang)
+        content = extractor.do_content()
+        markdown = html2text.html2text(content)
+
+        s = markdown
+        s = re.sub(r'^ *\*', '*', s, flags = re.MULTILINE)
+        s = re.sub(r'([^\n]\n)\*', r'\1\n*', s, flags = re.MULTILINE)
+        s = re.sub(r'…', '...', s)
+        s = re.sub(r'“', '"', s)
+        s = re.sub(r'”', '"', s)
+        markdown = s
+        #print(markdown)
+
+        caption = re.findall(
+            r'\[caption.*caption\]',
+            markdown,
+            flags = re.MULTILINE + re.DOTALL
+        )[0]
+
+        out = re.sub(r'\n', ' ', caption)
+        out = re.sub(r'(\(http[^\)]*) ', r'\1', out)
+
+        markdown = markdown.replace(caption, out)
+
+        self.filename = 'archive-%s.md' % archive
+        self.markdown = markdown
+
+        with open(self.filename, 'w') as text_file:
+            text_file.write(markdown)
+
+
+def test_a():
     #test()
     post = MockPost()
     #print(post)
@@ -102,4 +150,9 @@ if __name__ == "__main__":
     extractor = ExtractorPosting(post, 'pt')
     print(extractor.do_title())
     print(extractor.do_content())
+
+
+if __name__ == "__main__":
+    #test_a()
+    MarkdownDownload('alexandre', 'SENHA', 4391, True)
 
