@@ -118,23 +118,46 @@ class MarkdownDownload(object):
         s = re.sub(r'”', '"', s)
         markdown = s
         #print(markdown)
-
+        """
         caption = re.findall(
             r'\[caption.*caption\]',
             markdown,
             flags = re.MULTILINE + re.DOTALL
-        )[0]
+        )[0]  # TODO bug with 4639
 
         out = re.sub(r'\n', ' ', caption)
         out = re.sub(r'(\(http[^\)]*) ', r'\1', out)
 
         markdown = markdown.replace(caption, out)
-
+        """
         self.filename = 'archive-%s.md' % archive
         self.markdown = markdown
 
         with open(self.filename, 'w') as text_file:
             text_file.write(markdown)
+
+
+class Migrate_pt2pb(object):
+
+    def __init__(self, user, password, archive, lfrom='pt', lto='pb'):
+        client = Client('http://www.weeklyosm.eu/xmlrpc.php', user, password)
+        post = client.call(posts.GetPost(archive))
+        tagfrom = '<!--:%s-->' % lfrom
+        tagto = '<!--:%s-->' % lto
+        post.title = post.title.replace(tagfrom, tagto)
+        post.content = post.content.replace(tagfrom, tagto)
+        #print(post.title)
+        #print(post.content)
+        client.call(posts.EditPost(post.id, post))
+
+
+def test_pages(user, password):
+    from wordpress_xmlrpc import WordPressPage
+    client = Client('http://www.weeklyosm.eu/xmlrpc.php', user, password)
+    pages = client.call(posts.GetPosts({'post_type': 'page'}, results_class=WordPressPage))
+    p = pages[0]
+    print(p.id)
+    print(p.title)
 
 
 def test_a():
@@ -154,5 +177,7 @@ def test_a():
 
 if __name__ == "__main__":
     #test_a()
-    MarkdownDownload('alexandre', 'SENHA', 4391, True)
+    #MarkdownDownload('alexandre', 'SENHA', 4391, True)
+    Migrate_pt2pb('alexandre', 'SENHA', 10)
+    #test_pages('alexandre', 'SENHA')
 

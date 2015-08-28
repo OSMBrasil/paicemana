@@ -90,7 +90,7 @@ class RSSDownload(object):  # TODO class's comment # TODO
 
     def __init__(self):
 
-        url = 'http://www.weeklyosm.eu/pt/feed'
+        url = 'http://www.weeklyosm.eu/pb/feed'
         self.feed = feedparser.parse(url)
         self.__filter__()
         self.__transform__()
@@ -153,7 +153,7 @@ class RSSDownload(object):  # TODO class's comment # TODO
 
 
 if __name__ == "__main__":
-    #RSSDownload()
+    RSSDownload()
     #print(DataCaught())
     print(DataCaught().markdown())
 
