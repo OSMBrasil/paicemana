@@ -2,6 +2,7 @@ from wordpress_xmlrpc import Client
 from wordpress_xmlrpc.methods import posts
 
 import re
+import sys
 import html2text
 
 
@@ -142,14 +143,28 @@ class Migrate_pt2pb(object):
     def __init__(self, user, password, archive, lfrom='pt', lto='pb'):
         client = Client('http://www.weeklyosm.eu/xmlrpc.php', user, password)
         post = client.call(posts.GetPost(archive))
-        tagfrom = '<!--:%s-->' % lfrom
-        tagto = '<!--:%s-->' % lto
+        tagfrom = '[:%s]' % lfrom
+        tagto = '[:%s]' % lto
         post.title = post.title.replace(tagfrom, tagto)
         post.content = post.content.replace(tagfrom, tagto)
         #print(post.title)
         #print(post.content)
         client.call(posts.EditPost(post.id, post))
 
+class FixJaponese(object):
+
+    def __init__(self, user, password, archive):
+        client = Client('http://www.weeklyosm.eu/xmlrpc.php', user, password)
+        post = client.call(posts.GetPost(archive))
+        tag1_from = '<!--:Ja-->'
+        tag2_from = '[:Ja]'
+        tag1_to = '<!--:ja-->'
+        tag2_to = '[:ja]'
+        post.title = post.title.replace(tag1_from, tag1_to)
+        post.title = post.title.replace(tag2_from, tag2_to)
+        post.content = post.content.replace(tag1_from, tag1_to)
+        post.content = post.content.replace(tag2_from, tag2_to)
+        client.call(posts.EditPost(post.id, post))
 
 def test_pages(user, password):
     from wordpress_xmlrpc import WordPressPage
@@ -159,6 +174,10 @@ def test_pages(user, password):
     print(p.id)
     print(p.title)
 
+def test_get_post(user, password, archive):
+    client = Client('http://www.weeklyosm.eu/xmlrpc.php', user, password)
+    post = client.call(posts.GetPost(archive))
+    print(post.title)
 
 def test_a():
     #test()
@@ -178,6 +197,8 @@ def test_a():
 if __name__ == "__main__":
     #test_a()
     #MarkdownDownload('alexandre', 'SENHA', 4391, True)
-    Migrate_pt2pb('alexandre', 'SENHA', 10)
+    #Migrate_pt2pb('alexandre', 'SENHA', 4639)
     #test_pages('alexandre', 'SENHA')
+    #test_get_post('alexandre', 'SENHA', 3353)
+    FixJaponese('alexandre', 'SENHA', int(sys.argv[1]))
 
