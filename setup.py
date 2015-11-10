@@ -23,7 +23,9 @@ setup(name='paicemana',
       install_requires=[
           'click',
           'html2text',
-          'lxml'
+          'lxml',
+          'python-wordpress-xmlrpc',
+          'sortedcontainers'
       ],
       entry_points="""
       [console_scripts]
