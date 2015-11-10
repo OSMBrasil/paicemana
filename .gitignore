@@ -1,5 +1,7 @@
 # Project's temporary files
 *.csv
+*.htm
+*.xml
 archive-*.md
 
 # Byte-compiled / optimized / DLL files
