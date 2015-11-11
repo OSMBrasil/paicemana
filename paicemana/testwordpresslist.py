@@ -27,7 +27,7 @@ def get_wordpress_ids_for_weeks():
             for i in multiple:
                 tmp.append(int(i))
             multiple = list(tmp)
-            print(multiple, wordpress_id)
+            #print(multiple, wordpress_id)
 
             for i in multiple:
                 wordpress_weeks[i] = {'wordpress':wordpress_id}
@@ -39,8 +39,14 @@ def get_wordpress_ids_for_weeks():
     return wordpress_weeks
 
 
+def test_pretty_json(config):
+    import json
+    print(json.dumps(config, sort_keys=True, indent=4))
+
+
 if __name__ == "__main__":
-    print(get_wordpress_ids_for_weeks())
+    #print(get_wordpress_ids_for_weeks())
+    test_pretty_json(get_wordpress_ids_for_weeks())
 
 
 """ Exemplo (quebrado) com dados fictícios:
