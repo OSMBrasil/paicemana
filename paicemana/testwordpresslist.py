@@ -1,5 +1,7 @@
 from lxml import html
-import re
+
+import json, os, re
+
 
 def get_wordpress_ids_for_weeks():
 
@@ -40,13 +42,18 @@ def get_wordpress_ids_for_weeks():
 
 
 def test_pretty_json(config):
-    import json
     print(json.dumps(config, sort_keys=True, indent=4))
+
+def test_pretty_json_file(config):
+    with open(os.path.expanduser('~/.paicemana.json'), 'w') as outfile:
+        json.dump(config, outfile, sort_keys=True, indent=4)
 
 
 if __name__ == "__main__":
-    #print(get_wordpress_ids_for_weeks())
-    test_pretty_json(get_wordpress_ids_for_weeks())
+    data = get_wordpress_ids_for_weeks()
+    #print(ids)
+    test_pretty_json(data)
+    test_pretty_json_file(data)
 
 
 """ Exemplo (quebrado) com dados fictícios:
