@@ -57,7 +57,7 @@ def get_wordpress_ids_for_weeks():
             #print(multiple, wordpress_id)
 
             for i in multiple:
-                wordpress_weeks[i] = {'wordpress':wordpress_id}
+                wordpress_weeks[i] = {'wordpress': wordpress_id}
                 if len(multiple) > 1:
                     tmp = list(multiple)
                     tmp.remove(i)
@@ -66,12 +66,31 @@ def get_wordpress_ids_for_weeks():
     return wordpress_weeks
 
 
+def get_weeks_data():
+    wordpress_weeks = get_wordpress_ids_for_weeks()
+    osmbc_weeks = get_osbmc_ids_for_weeks()
+    data = wordpress_weeks  # reference
+    for week in osmbc_weeks:  # ideally the OSMBC has all
+        if week in data:
+            data[week]['osmbc'] = osmbc_weeks[week]
+        else:
+            data[week] = {'osmbc': osmbc_weeks[week]}
+    return data
+
+
 def test_pretty_json(config):
     print(json.dumps(config, sort_keys=True, indent=4))
 
 def test_pretty_json_file(config):
     with open(os.path.expanduser('~/.paicemana.json'), 'w') as outfile:
         json.dump(config, outfile, sort_keys=True, indent=4)
+
+
+class CorrelationJSON():  # will be like a manager
+
+    def sync(self):
+        with open(os.path.expanduser('~/.paicemana.json'), 'w') as outfile:
+            json.dump(get_weeks_data(), outfile, sort_keys=True, indent=4)
 
 
 class ImageCode():
@@ -116,7 +135,11 @@ class ImageCode():
 
 if __name__ == "__main__":
 
-    print(ImageCode())
+    #print(ImageCode())
+    #print(get_weeks_data())
+
+    myjson = CorrelationJSON()
+    myjson.sync()
 
     exit(0)
 
