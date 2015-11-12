@@ -1,4 +1,5 @@
 from lxml import html
+from string import Template
 
 import json, os, re
 
@@ -73,7 +74,52 @@ def test_pretty_json_file(config):
         json.dump(config, outfile, sort_keys=True, indent=4)
 
 
+class ImageCode():
+
+    template = '[caption id="attachment_$id" align="align$align" width="$width"]<a href="$url"><img class=" wp-image-$id" src="$url" alt="$alt" width="$width" height="$height" /></a>$text[/caption]'
+
+    def __init__(self,
+        id = 12684,
+        align = 'center',
+        width = 807,
+        height = 606,
+        url = 'http://blog.openstreetmap.de/wp-uploads//2015/11/before-after-road-styles-2.jpg',
+        alt = 'neuer Carto Map Style auf osm.org',
+        anchor = '#wn276_mapas',  # anchor=None to use a full HTML as text value
+        text = 'New OSM Carto Map Style at osm.org [1] <br/> Data: OpenStreetMap-Contributors, Image CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>'
+    ):
+        if anchor:
+            text = text.replace('[1]', '<a href="%s">[1]</a>' % anchor)
+
+        self.id = id
+        self.align = align
+        self.width = width
+        self.height = height
+        self.url = url
+        self.alt = alt
+        self.text = text
+
+    def __str__(self):
+        t = Template(ImageCode.template)
+        return t.substitute(
+            id = self.id,
+            align = self.align,
+            width = self.width,
+            height = self.height,
+            url = self.url,
+            alt = self.alt,
+            text = self.text
+        )
+        # or http://stackoverflow.com/a/2451826 (Python 2)
+        # or http://stackoverflow.com/a/2452382 (Python 3)
+
+
 if __name__ == "__main__":
+
+    print(ImageCode())
+
+    exit(0)
+
     print(get_osbmc_ids_for_weeks())
     data = get_wordpress_ids_for_weeks()
     #print(ids)
