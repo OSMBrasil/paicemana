@@ -1,9 +1,11 @@
 from wordpress_xmlrpc import Client
-from wordpress_xmlrpc.methods import posts
+from wordpress_xmlrpc.methods import posts, media
 
 import re
 import sys
 import html2text
+
+from human import CorrelationJSON, ImageCode
 
 
 def test():
@@ -194,7 +196,79 @@ def test_a():
     print(extractor.do_content())
 
 
+class PuppetOfMedia(object):
+
+    def __init__(self, user, password):
+        self.client = Client('http://www.weeklyosm.eu/xmlrpc.php', user, password)
+
+    def getList(self, parent=0, limit=5):
+        d = { 'number': limit, 'parent_id': parent }
+        return self.client.call(media.GetMediaLibrary(d))
+
+    def getItem(self, id=5782):
+        return self.client.call(media.GetMediaItem(id))
+
+    def getItemFor(self, week):
+        myjson = CorrelationJSON()  # TODO do singleton?
+        myjson.load()
+        myjson.non_multiples()
+        parent = myjson.get_wordpress_id_for(276)
+        return self.getList(parent, limit=1)[0]  # TODO is it unique? looks forever?
+
+
+def print_small(collection, with_link=False):
+    if with_link:
+        print()
+    for media in collection:
+        print(media.id, '|', media.parent, '|', media.title)
+        if with_link:
+            print(media.link)
+            print()
+
+def create_image_code(media_item, lang='pb'):
+    return ImageCode(
+        id = media_item.id,
+        width = media_item.metadata['width'],
+        height = media_item.metadata['height'],
+        url = media_item.link,
+        alt = media.title,  # TODO fix it to use "lang"
+        text = media.caption,  # TODO fix it to use "lang"
+        anchor = None
+    )
+
+
 if __name__ == "__main__":
+
+    puppet = PuppetOfMedia('alexandre', 'SENHA')
+
+    media = puppet.getItem()
+    #print(create_image_code(media))
+    print(media.title)
+
+    exit(0)
+
+    print(media.id)
+    print(media.parent)
+    print(media.link)
+    print(media.metadata)
+    print(media.title)
+    print(media.caption)
+    print(media.description)
+
+    exit(0)
+
+    print_small([puppet.getItemFor(276)], with_link=True)
+
+    exit(0)
+
+    print_small(puppet.getList())
+
+    exit(0)
+
+    print_small(puppet.getList(parent=5742), True)
+
+    exit(0)
+
     #test_a()
     #MarkdownDownload('alexandre', 'SENHA', 4391, True)
     #Migrate_pt2pb('alexandre', 'SENHA', 4639)
