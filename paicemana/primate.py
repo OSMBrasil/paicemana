@@ -68,7 +68,7 @@ class GetListWordpress(PageAction):
     URL = 'http://www.weeklyosm.eu/wp-admin/edit.php'
 
 
-if __name__ == "__main__":
+def previous_tests():
 
     #GetContentOSMBC(306).do()
 
@@ -82,6 +82,10 @@ if __name__ == "__main__":
     print(GetListOSMBC.URL)
     print(GetListOSMBC().url)
 
+
+if __name__ == "__main__":
+
     #GetContentOSMBC().do()
-    GetListOSMBC().do()
+    #GetListOSMBC().do()
+    GetListWordpress().do()
 

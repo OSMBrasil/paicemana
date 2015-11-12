@@ -3,12 +3,14 @@ from string import Template
 
 import json, os, re
 
+from primate import GetListOSMBC, GetListWordpress
+
 
 def get_osbmc_ids_for_weeks():
 
     # save http://thefive.sabic.uberspace.de/blog/list as "HTML only"
 
-    tree = html.parse('OSMBC.htm')
+    tree = html.parse(GetListOSMBC.FILENAME)
 
     anchors = tree.xpath('//a')
 
@@ -32,7 +34,7 @@ def get_wordpress_ids_for_weeks():
 
     # save http://www.weeklyosm.eu/wp-admin/edit.php as "HTML only"
 
-    tree = html.parse('WEEKLYOSM.htm')
+    tree = html.parse(GetListWordpress.FILENAME)
 
     anchors = tree.xpath('//a[@class="row-title"]')
 
@@ -41,7 +43,7 @@ def get_wordpress_ids_for_weeks():
     wordpress_weeks = {}
 
     for a in anchors:
-        text = a.text
+        text = a.text.replace('/', '-').replace('–', '-')
         link = a.get('href')
         if re.match(r'[Ww]eekly +[\d-]+', text) and re.match(r'\S+post=\d+&action=edit', link):
             week_number = text.split()[1]
@@ -49,6 +51,8 @@ def get_wordpress_ids_for_weeks():
             tmp = re.sub(r'&action=edit', '', tmp)
             wordpress_id = int(tmp)
             #print(week_number, " ", wordpress_id)
+            week_number = re.sub(r'^-+', '', week_number)
+            week_number = re.sub(r'-+$', '', week_number)
             multiple = week_number.split('-')
             tmp = []
             for i in multiple:
@@ -88,9 +92,41 @@ def test_pretty_json_file(config):
 
 class CorrelationJSON():  # will be like a manager
 
+    def __init__(self):
+        self.data = {}
+
+    def load(self):
+        with open(os.path.expanduser('~/.paicemana.json'), 'r') as infile:
+            self.data = json.load(infile)
+
     def sync(self):
         with open(os.path.expanduser('~/.paicemana.json'), 'w') as outfile:
             json.dump(get_weeks_data(), outfile, sort_keys=True, indent=4)
+
+    # obj.query(['osmbc','wordpress'], True)
+    # obj.query(['multiple'], exclude=True)
+    def query(self, keys, reset=False, exclude=False):
+        result = {}
+        for number in self.data:
+            keys_present = True
+            for key in keys:
+                if not key in self.data[number]:
+                    keys_present = False
+            if (keys_present and not exclude) or (not keys_present and exclude):
+                result[number] = self.data[number]
+        if reset:
+            self.data = result
+        return result
+
+    def non_multiples(self):
+        self.query(['wordpress','osmbc'], True)
+        self.query(['multiple'], True, exclude=True)
+
+    def get_osmbc_id_for(self, week):
+        return self.data[str(week)]['osmbc']
+
+    def get_wordpress_id_for(self, week):
+        return self.data[str(week)]['wordpress']
 
 
 class ImageCode():
@@ -135,11 +171,25 @@ class ImageCode():
 
 if __name__ == "__main__":
 
+    myjson = CorrelationJSON()
+    myjson.load()
+    myjson.non_multiples()
+    print(myjson.get_osmbc_id_for(276))
+    print(myjson.get_wordpress_id_for(276))
+
+    exit(0)
+
     #print(ImageCode())
     #print(get_weeks_data())
 
     myjson = CorrelationJSON()
-    myjson.sync()
+    #myjson.sync()
+    myjson.load()
+    #print(myjson.data)
+    r = myjson.query(['wordpress','osmbc'], True)
+    test_pretty_json(r)
+    r = myjson.query(['multiple'], exclude=True)
+    test_pretty_json(r)
 
     exit(0)
 
@@ -148,16 +198,4 @@ if __name__ == "__main__":
     #print(ids)
     test_pretty_json(data)
     test_pretty_json_file(data)
-
-
-""" Exemplo (quebrado) com dados fictícios:
-{
-    "277": {
-        "osmbc": 36335,
-        "wordpress": 262625
-        "multiple": [18181, 17171, 17171],
-        "image": "5751"
-    }
-}
-"""
 
