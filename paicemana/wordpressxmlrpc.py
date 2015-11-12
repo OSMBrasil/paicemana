@@ -73,7 +73,7 @@ class ChangerPosting(object):
         print(self.post)
 
 
-class ExtractorPosting(object):
+class ExtractorPosting(object):  # TODO fix pattern?
 
     def __init__(self, post, lang='Ja'):
         self.post = post
@@ -91,6 +91,27 @@ class ExtractorPosting(object):
 
     def do_title(self):
         return ExtractorPosting.do(self.post.title, self.lang)
+
+
+class ExtractorMedia(object):
+
+    def __init__(self, media, lang='Ja'):
+        self.media = media
+        self.lang = lang
+
+    def __map_lang__(lang, text):
+        return (lang[2:-1], text)
+
+    def do(src, lang):
+        texts = re.split(r'\[:..\]', src.replace('[:]', ''))[1:]  # TODO check size
+        langs = re.findall(r'\[:..\]', src)
+        return dict(map(ExtractorMedia.__map_lang__, langs, texts))[lang]
+
+    def do_caption(self):
+        return ExtractorMedia.do(self.media.caption, self.lang)
+
+    def do_title(self):
+        return ExtractorMedia.do(self.media.title, self.lang)
 
 
 # TODO a class MarkdownDownload() here, using the ExtractorPosting()
@@ -226,24 +247,43 @@ def print_small(collection, with_link=False):
             print()
 
 def create_image_code(media_item, lang='pb'):
+    extractor = ExtractorMedia(media_item, lang)
     return ImageCode(
         id = media_item.id,
         width = media_item.metadata['width'],
         height = media_item.metadata['height'],
         url = media_item.link,
-        alt = media.title,  # TODO fix it to use "lang"
-        text = media.caption,  # TODO fix it to use "lang"
+        alt = extractor.do_title(),
+        text = extractor.do_caption(),
         anchor = None
     )
+
+
+class MockMedia(object):
+
+    def __init__(self):
+        self.title = '[:en]New OSM Carto Map Style at osm.org[:es]before-after-road-styles-2[:cz]before-after-road-styles-2[:ja]before-after-road-styles-2[:fr]before-after-road-styles-2[:pb]Novo estilo de mapa do OSM Carto no osm.org[:id]before-after-road-styles-2[:tr]before-after-road-styles-2[:de]neuer Carto Map Style auf osm.org[:]'
+        self.caption = '[:en]New OSM Carto Map Style at osm.org <a href="#wn276_maps">[1]</a> Data: OpenStreetMap-Contributors, Image CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:es]Novo estilo de mapa do OSM Carto no osm.org <a href="#wn276_maps">[1]</a> Fonte: Contribuidores do OpenStreetMap, image sob  CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:cz]Novo estilo de mapa do OSM Carto no osm.org <a href="#wn276_maps">[1]</a> Fonte: Contribuidores do OpenStreetMap, image sob  CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:ja]Novo estilo de mapa do OSM Carto no osm.org <a href="#wn276_maps">[1]</a> Fonte: Contribuidores do OpenStreetMap, image sob  CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:fr]Novo estilo de mapa do OSM Carto no osm.org <a href="#wn276_maps">[1]</a> Fonte: Contribuidores do OpenStreetMap, image sob  CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:pb]Novo estilo de mapa do OSM Carto no osm.org <a href="#wn276_maps">[1]</a> Fonte: Contribuidores do OpenStreetMap, image sob  CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:id]Novo estilo de mapa do OSM Carto no osm.org <a href="#wn276_maps">[1]</a> Fonte: Contribuidores do OpenStreetMap, image sob  CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:tr]Novo estilo de mapa do OSM Carto no osm.org <a href="#wn276_maps">[1]</a> Fonte: Contribuidores do OpenStreetMap, image sob  CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:de]Novo estilo de mapa do OSM Carto no osm.org <a href="#wn276_maps">[1]</a> Fonte: Contribuidores do OpenStreetMap, image sob  CC-BY-SA 2.0 <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>[:]'
 
 
 if __name__ == "__main__":
 
     puppet = PuppetOfMedia('alexandre', 'SENHA')
+    media = puppet.getItem()
+    print(create_image_code(media))
+
+    exit(0)
+
+    extractor = ExtractorMedia(MockMedia(), 'pb')
+    print(extractor.do_title())
+    print(extractor.do_caption())
+
+    exit(0)
 
     media = puppet.getItem()
     #print(create_image_code(media))
     print(media.title)
+    print(media.caption)
 
     exit(0)
 
