@@ -3,6 +3,30 @@ from lxml import html
 import json, os, re
 
 
+def get_osbmc_ids_for_weeks():
+
+    # save http://thefive.sabic.uberspace.de/blog/list as "HTML only"
+
+    tree = html.parse('OSMBC.htm')
+
+    anchors = tree.xpath('//a')
+
+    # prices = tree.xpath('//span[@class="item-price"]/text()')
+
+    osmbc_weeks = {}
+
+    for a in anchors:
+        text = a.text
+        link = a.get("href")
+        if re.match(r'WN\d+', text) and re.match(r'/blog', link):
+            week_number = int(re.sub(r'[^0-9]', '', text))
+            osmbc_id = int(re.sub(r'[^0-9]', '', link))
+            #print("\"%s\" \"%s\"" % (text, link))
+            osmbc_weeks[week_number] = osmbc_id
+
+    return osmbc_weeks
+
+
 def get_wordpress_ids_for_weeks():
 
     # save http://www.weeklyosm.eu/wp-admin/edit.php as "HTML only"
@@ -50,6 +74,7 @@ def test_pretty_json_file(config):
 
 
 if __name__ == "__main__":
+    print(get_osbmc_ids_for_weeks())
     data = get_wordpress_ids_for_weeks()
     #print(ids)
     test_pretty_json(data)
