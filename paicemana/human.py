@@ -1,9 +1,9 @@
-from lxml import html
+from lxml import html, etree
 from string import Template
 
 import json, os, re
 
-from primate import GetListOSMBC, GetListWordpress
+from primate import GetListOSMBC, GetListWordpress, GetContentOSMBC
 
 
 def get_osbmc_ids_for_weeks():
@@ -169,7 +169,70 @@ class ImageCode():
         # or http://stackoverflow.com/a/2452382 (Python 3)
 
 
+class DocumentPreparing(object):
+
+    def __init__(self):
+        self.tree = html.parse(GetContentOSMBC.FILENAME)
+
+    def print(self):
+        print(etree.tostring(self.tree, method='html', pretty_print=True))  # TODO \n
+
+    def write(self):  # note: it only working so, but it is utf-8 (?)  TODO: issue at OSBMC project?
+        self.tree.write('/tmp/weekly-final.htm', method='html', pretty_print=True, encoding='iso-8859-1')
+
+    def delete_untranslated(self):
+        anchors = self.tree.xpath('//li[not(p)]')
+        for li in anchors:
+            li.getparent().remove(li)
+
+    def finalize(self):
+        with open(os.path.expanduser('/tmp/weekly-final.htm'), 'r') as f:
+            doc = f.read()
+
+        doc = re.sub(
+            r'^<\!DOCTYPE[^\n]*\n', '', doc,
+            flags = re.MULTILINE + re.DOTALL
+        )
+
+        doc = re.sub(
+            r'^<html[^\n]*\n', '', doc,
+            flags = re.MULTILINE + re.DOTALL
+        )
+
+        doc = re.sub(
+            r'^<\/body[^\n]*\n', '', doc,
+            flags = re.MULTILINE + re.DOTALL
+        )
+
+        doc = re.sub(
+            r'^[^\n]*--unpublished--<\/h2>.*', '', doc,
+            flags = re.MULTILINE + re.DOTALL
+        )
+
+        doc = re.sub(
+            r'^[^\n]*Não traduzido<\/h2>.*', '', doc,
+            flags = re.MULTILINE + re.DOTALL
+        )
+
+        #<!--         place picture here              -->
+
+        doc = re.sub(
+            r'^<\!--[ \t]*place picture here[ \t]*-->', '<!-- place picture here -->', doc,
+            flags = re.MULTILINE + re.DOTALL
+        )
+
+        with open(os.path.expanduser('/tmp/weekly-final.htm'), 'w') as f:
+            f.write(doc)
+
+
 if __name__ == "__main__":
+
+    doc = DocumentPreparing()
+    doc.delete_untranslated()
+    doc.write()
+    doc.finalize()
+
+    exit()
 
     myjson = CorrelationJSON()
     myjson.load()
